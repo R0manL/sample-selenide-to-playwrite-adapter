@@ -1,6 +1,6 @@
-# smartit automated testing.
+# Sample project with Selenide to Playwright adapter.
 
-This document describes architecture, how to setup, execute and analyze results of automated tests execution for smartit project.
+This project shows how to develop Selenide-like tests and use Playwright (instead of Selenium) under the hood.
 
 
 ## Quick Start
@@ -54,7 +54,6 @@ This document describes architecture, how to setup, execute and analyze results 
 │   │   │                       ├── EmailUtils.java
 │   │   │                       └── StringUtils.java
 │   │   └── resources
-│   │       ├── allure.properties - allure reporting properties
 │   │       ├── default.properties - common properties (for all envs), props that used for local (from IDE) execution
 │   │       ├── qa-env.properties - qa environment specific properties
 │   │       ├── test-env.properties - test environment specific properties
@@ -145,25 +144,16 @@ Logging level can be set in /test/java/resource/simplelogger.properties file.
 
 ## CI/CD
 * [AUTO-TESTS-UI-STORYBOOK-MAIN](https://dev.azure.com/smartit-gmbh/smartit/_build?definitionId=325) - UI storybook tests.
-* [AUTO-TESTS-UI-STORYBOOK-DEVELOP](https://dev.azure.com/smartit-gmbh/smartit/_build?definitionId=384) - UI storybook tests (development branch).
 * [AUTO-TESTS-UI-SMOKE-MAIN](https://dev.azure.com/smartit-gmbh/smartit/_build?definitionId=385) - UI smoke tests. Quick tests that only navigate thorough all pages and check if any errors on the page appears.
-* [AUTO-TESTS-API-REGRESSION-MAIN](https://dev.azure.com/smartit-gmbh/smartit/_build?definitionId=350) - API regression tests.
-
 
 ## Test environment:
-Automation team required at least one VM that host docker containers and execution results:
- - selenoid - for remote tests execution;
- - selenoid-ui - visualize remote tests execution progress;
- - video-recorder - record video of remote tests execution;
- - chrome-browser (for each execution thread) - contains chrome browser that used for remote tests execution.
-
 Requirements:
  - RAM = 16GB
  - SSH = 16GB+
 
 
 ### Test data
-- Test group with name: `TEST_AUTOMATION` must be created under `Artem Denysovv user, visible for `autom_test01` user;
+- Test group with name: `TEST_AUTOMATION` must be created under `root user, visible for `autom_test01` user;
 - `autom_test01` user must have admin role to access API;
 
 ### JUnit Tags
@@ -183,16 +173,6 @@ For running tests in headed version:
 ### Pre / post conditions
 Pre/post conditions for Junit5 has implemented using [custom listener](https://junit.org/junit5/docs/current/user-guide/#launcher-api-listeners-custom)
 Sample project is [here](https://github.com/khmarbaise/junit-jupiter-listener/blob/main/src/main/java/io/soebes/extension/MyOwnListener.java).
+peline about playwright missed libs. Install read this:
 
-
-### Known issues
-### EOL conversion issue (Collapp tests)
-*.csv templates for Collapp tests (located in /resouurces/collapp/) must have windows style (CRLF) end-of-line (EOL).
-Git that used in Azure may convert automatically EOL into linux style, and tests will fail. To prevent git from conversion, disable it with:
-```
-git config --global core.autocrlf false
-```
-
-### Playwright missing labs warning
-If you get a warning when run azure pipeline about playwright missed libs. Install read this:
 https://github.com/microsoft/playwright/issues/30368

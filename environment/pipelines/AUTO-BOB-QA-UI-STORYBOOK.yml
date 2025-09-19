@@ -1,0 +1,47 @@
+# Cron Schedules have been converted using UTC Time Zone and may need to be updated for your location
+variables:
+- name: BuildParameters.searchFolder
+  value: $(System.DefaultWorkingDirectory)
+- name: BuildParameters.testRunner
+  value: JUnit
+- name: BuildParameters.testResultsFiles
+  value: '**/TEST-*.xml'
+schedules:
+- cron: 0 21 * * 1,2,3,4,5
+  branches:
+    include:
+    - refs/heads/develop
+jobs:
+- job: Job_1
+  displayName: Storybook tests (Playwright)
+  timeoutInMinutes: 1500
+  pool:
+    name: Automation-Test-Allure-QA01
+    demands:
+    - agent.name -equals vmdockerqa02weu
+  steps:
+  - checkout: self
+  - task: CmdLine@2
+    displayName: Run tests
+    continueOnError: True
+    inputs:
+      script: xvfb-run mvn clean test -Dgroups="ui&smartbox&storybook"
+  - task: CmdLine@2
+    displayName: Add Owner to report
+    continueOnError: True
+    inputs:
+      script: mvn test -Dgroups="ui&smartbox&add_owner"
+  - task: PublishTestResults@2
+    displayName: Publish Test Results
+    continueOnError: True
+    inputs:
+      testRunner: $(BuildParameters.testRunner)
+      testResultsFiles: $(BuildParameters.testResultsFiles)
+      searchFolder: $(BuildParameters.searchFolder)
+  - task: PublishPipelineArtifact@1
+    displayName: Add playwright trace files
+    continueOnError: True
+    inputs:
+      path: $(System.DefaultWorkingDirectory)
+      artifactName: Publish attachments
+...
